@@ -1,4 +1,4 @@
-const { createTask, toggleTask, deleteTask, filterTasks } = require('./core');
+const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted } = require('./core');
 const { loadTasks, saveTasks } = require('./storage');
 const { renderApp } = require('./render');
 
@@ -36,8 +36,57 @@ function initApp(doc, storage) {
       tasks = deleteTask(tasks, li.dataset.id);
       saveTasks(storage, tasks);
       render();
+    } else if (target.classList.contains('clear-completed')) {
+      tasks = clearCompleted(tasks);
+      saveTasks(storage, tasks);
+      render();
     } else if (target.dataset.filter) {
       currentFilter = target.dataset.filter;
+      render();
+    }
+  });
+
+  app.addEventListener('dblclick', (e) => {
+    const target = e.target;
+    if (target.classList.contains('task-title')) {
+      const li = target.closest('.task-item');
+      if (!li) return;
+      tasks = tasks.map(t => t.id === li.dataset.id ? { ...t, editing: true } : t);
+      render();
+    }
+  });
+
+  app.addEventListener('keydown', (e) => {
+    const target = e.target;
+    if (target.classList.contains('edit-input')) {
+      const li = target.closest('.task-item');
+      if (!li) return;
+      if (e.key === 'Enter') {
+        const newTitle = target.value.trim();
+        if (newTitle) {
+          tasks = updateTask(tasks, li.dataset.id, newTitle);
+          tasks = tasks.map(t => t.id === li.dataset.id ? { ...t, editing: false } : t);
+          saveTasks(storage, tasks);
+        }
+        render();
+      } else if (e.key === 'Escape') {
+        tasks = tasks.map(t => t.id === li.dataset.id ? { ...t, editing: false } : t);
+        render();
+      }
+    }
+  });
+
+  app.addEventListener('focusout', (e) => {
+    const target = e.target;
+    if (target.classList.contains('edit-input')) {
+      const li = target.closest('.task-item');
+      if (!li) return;
+      const newTitle = target.value.trim();
+      if (newTitle) {
+        tasks = updateTask(tasks, li.dataset.id, newTitle);
+      }
+      tasks = tasks.map(t => t.id === li.dataset.id ? { ...t, editing: false } : t);
+      saveTasks(storage, tasks);
       render();
     }
   });

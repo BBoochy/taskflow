@@ -29,4 +29,12 @@ function filterTasks(tasks, filter) {
   }
 }
 
-module.exports = { createTask, toggleTask, deleteTask, filterTasks };
+function updateTask(tasks, taskId, newTitle) {
+  return tasks.map(t => t.id === taskId ? { ...t, title: newTitle } : t);
+}
+
+function clearCompleted(tasks) {
+  return tasks.filter(t => !t.completed);
+}
+
+module.exports = { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted };
