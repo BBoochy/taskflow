@@ -7,7 +7,7 @@ function makeStorage(initial) {
 function makeDoc() {
   const listeners = {}, input = { value: '' }, container = { innerHTML: '' };
   const app = {
-    addEventListener: jest.fn((t, h) => { listeners[t] = h; }),
+    addEventListener: jest.fn((evt, h) => { listeners[evt] = h; }),
     querySelector: jest.fn(s => s === '.task-input' ? input : s === '.task-container' ? container : null),
   };
   return { getElementById: jest.fn(() => app), _app: app, _input: input, _container: container, _listeners: listeners };
@@ -20,10 +20,12 @@ describe('App Controller', () => {
   let doc, storage;
   beforeEach(() => { doc = makeDoc(); storage = makeStorage(); });
 
-  test('event delegation: single click listener on #app', () => {
+  test('event delegation: registers event listeners on #app', () => {
     initApp(doc, storage);
     expect(doc._app.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
-    expect(doc._app.addEventListener).toHaveBeenCalledTimes(1);
+    expect(doc._app.addEventListener).toHaveBeenCalledWith('dblclick', expect.any(Function));
+    expect(doc._app.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(doc._app.addEventListener).toHaveBeenCalledWith('focusout', expect.any(Function));
   });
   test('onLoad: loads tasks from storage and renders', () => {
     storage = makeStorage([{ id: '1', title: 'Loaded', completed: false, createdAt: '2026-01-01' }]);
@@ -74,5 +76,25 @@ describe('App Controller', () => {
     expect(doc._container.innerHTML).toContain('Active');
     expect(doc._container.innerHTML).not.toContain('Done');
     expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  test('clearCompleted: removes completed tasks and saves', () => {
+    storage = makeStorage([
+      { id: 'c1', title: 'Done', completed: true, createdAt: '2026-01-01' },
+      { id: 'c2', title: 'Active', completed: false, createdAt: '2026-01-01' },
+    ]);
+    initApp(doc, storage);
+    storage.setItem.mockClear();
+    doc._listeners.click(ev({ classList: { contains: c => c === 'clear-completed' } }));
+    const saved = JSON.parse(storage.setItem.mock.calls[0][1]);
+    expect(saved).toHaveLength(1);
+    expect(saved[0].title).toBe('Active');
+  });
+
+  test('dblclick: enters edit mode on task title', () => {
+    storage = makeStorage([{ id: 'e1', title: 'Edit me', completed: false, createdAt: '2026-01-01' }]);
+    initApp(doc, storage);
+    doc._listeners.dblclick(ev({ classList: { contains: c => c === 'task-title' }, closest: () => ({ dataset: { id: 'e1' } }) }));
+    expect(doc._container.innerHTML).toContain('edit-input');
   });
 });

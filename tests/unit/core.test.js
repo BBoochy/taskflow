@@ -1,4 +1,4 @@
-const { createTask, toggleTask, deleteTask, filterTasks } = require('../../src/core');
+const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted } = require('../../src/core');
 
 describe('createTask', () => {
   test('returns task with correct shape and unique ids', () => {
@@ -38,14 +38,26 @@ describe('filterTasks', () => {
     { id: '3', title: 'C', completed: false, createdAt: new Date() },
   ];
   test('all returns every task', () => expect(filterTasks(tasks, 'all')).toHaveLength(3));
-  test('active returns incomplete', () => {
-    const result = filterTasks(tasks, 'active');
-    expect(result).toHaveLength(2);
-    expect(result.every(t => !t.completed)).toBe(true);
+  test('active returns incomplete', () => expect(filterTasks(tasks, 'active')).toHaveLength(2));
+  test('completed returns done', () => expect(filterTasks(tasks, 'completed')).toHaveLength(1));
+});
+
+describe('updateTask', () => {
+  test('updates title by id, returns new array, no-op for missing id', () => {
+    const tasks = [createTask('Old'), createTask('Other')];
+    const result = updateTask(tasks, tasks[0].id, 'New');
+    expect(result[0].title).toBe('New');
+    expect(result).not.toBe(tasks);
+    expect(updateTask(tasks, 'x', 'B')[0].title).toBe('Old');
   });
-  test('completed returns done', () => {
-    const result = filterTasks(tasks, 'completed');
+});
+
+describe('clearCompleted', () => {
+  test('removes completed tasks and returns new array', () => {
+    const done = { id: '1', title: 'A', completed: true, createdAt: new Date() };
+    const active = { id: '2', title: 'B', completed: false, createdAt: new Date() };
+    const result = clearCompleted([done, active]);
     expect(result).toHaveLength(1);
-    expect(result[0].completed).toBe(true);
+    expect(result[0].title).toBe('B');
   });
 });

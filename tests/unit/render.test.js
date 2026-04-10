@@ -48,4 +48,14 @@ describe('renderApp', () => {
     expect(html).toContain('data-filter="active"');
     expect(html).toMatch(/data-filter="active"[^>]*class="[^"]*active/);
   });
+
+  it('renders clear completed button', () => {
+    expect(renderApp([createTask('X')], 'all')).toContain('clear-completed');
+  });
+
+  it('renders edit-input in edit mode, task-title otherwise', () => {
+    const editing = { ...createTask('E'), editing: true };
+    expect(renderTask(editing)).toContain('edit-input');
+    expect(renderTask(createTask('N'))).not.toContain('edit-input');
+  });
 });
