@@ -1,4 +1,4 @@
-const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted } = require('./core');
+const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted, validateTitle } = require('./core');
 const { loadTasks, saveTasks } = require('./storage');
 const { renderApp } = require('./render');
 
@@ -18,12 +18,7 @@ function initApp(doc, storage) {
     const target = e.target;
 
     if (target.classList.contains('add-btn')) {
-      const title = input.value.trim();
-      if (!title) return;
-      tasks = [...tasks, createTask(title)];
-      saveTasks(storage, tasks);
-      input.value = '';
-      render();
+      addTask();
     } else if (target.type === 'checkbox') {
       const li = target.closest('.task-item');
       if (!li) return;
@@ -46,6 +41,16 @@ function initApp(doc, storage) {
     }
   });
 
+  function addTask() {
+    const title = input.value.trim();
+    if (validateTitle(title) !== true) return;
+    tasks = [...tasks, createTask(title)];
+    saveTasks(storage, tasks);
+    input.value = '';
+    render();
+    input.focus();
+  }
+
   app.addEventListener('dblclick', (e) => {
     const target = e.target;
     if (target.classList.contains('task-title')) {
@@ -58,6 +63,10 @@ function initApp(doc, storage) {
 
   app.addEventListener('keydown', (e) => {
     const target = e.target;
+    if (target === input && e.key === 'Enter') {
+      addTask();
+      return;
+    }
     if (target.classList.contains('edit-input')) {
       const li = target.closest('.task-item');
       if (!li) return;

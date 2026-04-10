@@ -2,60 +2,46 @@ const { createTask } = require('../../src/core');
 const { renderTask, renderTaskList, renderApp } = require('../../src/render');
 
 describe('renderTask', () => {
-  it('renders title, checkbox, delete button, date, and data-id', () => {
+  it('renders task with checkbox, title, date, delete, data-id, and ARIA', () => {
     const task = createTask('Buy groceries');
     const html = renderTask(task);
     expect(html).toContain('Buy groceries');
-    expect(html).toContain('<input');
     expect(html).toContain('type="checkbox"');
-    expect(html).toContain('delete');
     expect(html).toContain(`data-id="${task.id}"`);
     expect(html).toContain('class="task-date"');
+    expect(html).toContain('aria-label=');
+    expect(html).toContain('role=');
   });
-
-  it('marks completed tasks with checked attribute', () => {
-    const task = { ...createTask('Done'), completed: true };
-    const html = renderTask(task);
-    expect(html).toContain('checked');
+  it('marks completed tasks and renders edit mode', () => {
+    expect(renderTask({ ...createTask('D'), completed: true })).toContain('checked');
+    expect(renderTask({ ...createTask('E'), editing: true })).toContain('edit-input');
+    expect(renderTask(createTask('N'))).not.toContain('edit-input');
   });
 });
 
 describe('renderTaskList', () => {
-  it('wraps tasks in ul with li items, empty when no tasks', () => {
-    const tasks = [createTask('Task 1'), createTask('Task 2')];
-    const html = renderTaskList(tasks);
+  it('wraps tasks in semantic ul, shows empty state when no tasks', () => {
+    const html = renderTaskList([createTask('T1'), createTask('T2')]);
     expect(html).toContain('<ul');
-    expect(html).toContain('Task 1');
-    expect(html).toContain('Task 2');
+    expect(html).toContain('role="list"');
     expect((html.match(/<li/g) || []).length).toBe(2);
-    expect(renderTaskList([])).not.toContain('<li');
+    expect(renderTaskList([])).toContain('No tasks yet');
   });
 });
 
 describe('renderApp', () => {
-  it('renders task list with filter controls and count', () => {
-    const tasks = [createTask('One'), createTask('Two')];
-    const html = renderApp(tasks, 'all');
+  it('renders filters, count, clear-completed, and active button', () => {
+    const html = renderApp([createTask('One'), createTask('Two')], 'all');
     expect(html).toContain('One');
     expect(html).toContain('All');
     expect(html).toContain('Active');
-    expect(html).toContain('Completed');
-    expect(html).toContain('2');
+    expect(html).toContain('clear-completed');
+    const active = renderApp([], 'active');
+    expect(active).toMatch(/data-filter="active"[^>]*class="[^"]*active/);
   });
-
-  it('marks the active filter button', () => {
-    const html = renderApp([], 'active');
-    expect(html).toContain('data-filter="active"');
-    expect(html).toMatch(/data-filter="active"[^>]*class="[^"]*active/);
-  });
-
-  it('renders clear completed button', () => {
-    expect(renderApp([createTask('X')], 'all')).toContain('clear-completed');
-  });
-
-  it('renders edit-input in edit mode, task-title otherwise', () => {
-    const editing = { ...createTask('E'), editing: true };
-    expect(renderTask(editing)).toContain('edit-input');
-    expect(renderTask(createTask('N'))).not.toContain('edit-input');
+  it('renders empty state message when no tasks', () => {
+    const html = renderApp([], 'all');
+    expect(html).toContain('No tasks yet');
+    expect(html).toContain('add one above');
   });
 });

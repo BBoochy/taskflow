@@ -5,7 +5,7 @@ function makeStorage(initial) {
   return { getItem: jest.fn(k => store[k] || null), setItem: jest.fn((k, v) => { store[k] = v; }) };
 }
 function makeDoc() {
-  const listeners = {}, input = { value: '' }, container = { innerHTML: '' };
+  const listeners = {}, input = { value: '', focus: jest.fn(), classList: { contains: () => false } }, container = { innerHTML: '' };
   const app = {
     addEventListener: jest.fn((evt, h) => { listeners[evt] = h; }),
     querySelector: jest.fn(s => s === '.task-input' ? input : s === '.task-container' ? container : null),
@@ -33,9 +33,9 @@ describe('App Controller', () => {
     expect(storage.getItem).toHaveBeenCalledWith('taskflow-tasks');
     expect(doc._container.innerHTML).toContain('Loaded');
   });
-  test('onLoad: renders empty list when no tasks', () => {
+  test('onLoad: renders empty state when no tasks', () => {
     initApp(doc, storage);
-    expect(doc._container.innerHTML).toContain('task-list');
+    expect(doc._container.innerHTML).toContain('No tasks yet');
   });
   test('addTask: creates, saves, re-renders, clears input', () => {
     initApp(doc, storage);
@@ -96,5 +96,25 @@ describe('App Controller', () => {
     initApp(doc, storage);
     doc._listeners.dblclick(ev({ classList: { contains: c => c === 'task-title' }, closest: () => ({ dataset: { id: 'e1' } }) }));
     expect(doc._container.innerHTML).toContain('edit-input');
+  });
+
+  test('addTask: rejects empty title after trim (validation)', () => {
+    initApp(doc, storage);
+    doc._input.value = '   ';
+    doc._listeners.click(ev({ classList: { contains: c => c === 'add-btn' } }));
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  test('keydown Enter on task-input adds task', () => {
+    initApp(doc, storage);
+    doc._input.value = 'Keyboard task';
+    doc._listeners.keydown({ target: doc._input, key: 'Enter', preventDefault: jest.fn() });
+    expect(doc._container.innerHTML).toContain('Keyboard task');
+    expect(storage.setItem).toHaveBeenCalled();
+  });
+
+  test('renders empty state message when no tasks', () => {
+    initApp(doc, storage);
+    expect(doc._container.innerHTML).toContain('No tasks yet');
   });
 });
