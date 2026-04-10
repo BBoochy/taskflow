@@ -1,0 +1,36 @@
+fail_fast: true
+
+repos:
+  # Layer 1: File hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+
+  # Layer 2: JS syntax validation
+  - repo: local
+    hooks:
+      - id: js-syntax-check
+        name: JavaScript Syntax Check
+        entry: bash -c 'for f in "$@"; do node --check "$f" || exit 1; done'
+        language: system
+        files: \.js$
+        exclude: node_modules/
+
+  # Layer 3: Unit tests (TIA)
+  - repo: local
+    hooks:
+      - id: jest-tia
+        name: Jest TIA (affected tests only)
+        entry: bash -c 'npx jest --forceExit --passWithNoTests'
+        language: system
+        files: \.(js|json)$
+        exclude: node_modules/
+        pass_filenames: false
+        stages: [pre-commit]
