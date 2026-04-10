@@ -37,4 +37,9 @@ function clearCompleted(tasks) {
   return tasks.filter(t => !t.completed);
 }
 
-module.exports = { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted };
+function validateTitle(title) {
+  if (!title || !title.trim()) return 'Title cannot be empty';
+  return true;
+}
+
+module.exports = { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted, validateTitle };

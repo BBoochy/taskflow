@@ -2,17 +2,20 @@ function renderTask(task) {
   const checked = task.completed ? ' checked' : '';
   const dateStr = new Date(task.createdAt).toLocaleDateString();
   const titleHtml = task.editing
-    ? `<input class="edit-input" value="${task.title}">`
+    ? `<input class="edit-input" value="${task.title}" aria-label="Edit task title">`
     : `<span class="task-title">${task.title}</span>`;
-  return `<li class="task-item${task.completed ? ' completed' : ''}" data-id="${task.id}">` +
-    `<input type="checkbox"${checked}>` +
+  return `<li class="task-item${task.completed ? ' completed' : ''}" data-id="${task.id}" role="listitem">` +
+    `<input type="checkbox"${checked} aria-label="Toggle ${task.title}">` +
     titleHtml +
     `<span class="task-date">${dateStr}</span>` +
-    `<button class="delete" data-action="delete">delete</button></li>`;
+    `<button class="delete" data-action="delete" aria-label="Delete ${task.title}">delete</button></li>`;
 }
 
 function renderTaskList(tasks) {
-  return `<ul class="task-list">${tasks.map(renderTask).join('')}</ul>`;
+  if (tasks.length === 0) {
+    return `<p class="empty-state">No tasks yet — add one above</p>`;
+  }
+  return `<ul class="task-list" role="list">${tasks.map(renderTask).join('')}</ul>`;
 }
 
 function renderApp(tasks, filter) {

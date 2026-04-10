@@ -1,4 +1,4 @@
-const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted } = require('../../src/core');
+const { createTask, toggleTask, deleteTask, filterTasks, updateTask, clearCompleted, validateTitle } = require('../../src/core');
 
 describe('createTask', () => {
   test('returns task with correct shape and unique ids', () => {
@@ -59,5 +59,20 @@ describe('clearCompleted', () => {
     const result = clearCompleted([done, active]);
     expect(result).toHaveLength(1);
     expect(result[0].title).toBe('B');
+  });
+});
+
+describe('validateTitle', () => {
+  test('rejects empty string', () => {
+    expect(validateTitle('')).toBe('Title cannot be empty');
+  });
+  test('rejects whitespace-only string', () => {
+    expect(validateTitle('   ')).toBe('Title cannot be empty');
+  });
+  test('returns true for valid title', () => {
+    expect(validateTitle('Buy groceries')).toBe(true);
+  });
+  test('trims whitespace and validates', () => {
+    expect(validateTitle('  Hello  ')).toBe(true);
   });
 });

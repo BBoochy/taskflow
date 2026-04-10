@@ -7,14 +7,15 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="app">
+  <main id="app" role="main" aria-label="TaskFlow application">
     <h1>TaskFlow</h1>
-    <div class="add-task">
-      <input type="text" class="task-input" placeholder="Add a task...">
-      <button class="add-btn">Add</button>
-    </div>
-    <div class="task-container"></div>
-  </div>
+    <form class="add-task" role="search" aria-label="Add task" onsubmit="return false;">
+      <label for="task-input" class="sr-only">Task title</label>
+      <input type="text" id="task-input" class="task-input" placeholder="Add a task..." aria-label="Task title" autofocus>
+      <button class="add-btn" type="button" aria-label="Add task">Add</button>
+    </form>
+    <section class="task-container" aria-live="polite" aria-label="Task list"></section>
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
