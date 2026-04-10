@@ -1,0 +1,26 @@
+{
+  "step": 8,
+  "deployedAt": "2026-04-10T05:35:00Z",
+  "stack": "javascript",
+  "scripts": [
+    "scripts/governance/check-silent-catches.js",
+    "scripts/governance/check-mock-tax.js",
+    "scripts/governance/check-eslint-disable.js",
+    "scripts/governance/guardrails-check.js",
+    "scripts/governance/check-skipped-tests.js",
+    "scripts/governance/collect-metrics.js"
+  ],
+  "baselines": [
+    ".memory-layer/baselines/silent-catches.json",
+    ".memory-layer/baselines/eslint-disables.json",
+    ".memory-layer/baselines/metrics.json"
+  ],
+  "precommitLayers": 10,
+  "philosophies": [
+    "Iron Dome Ratchet",
+    "Rising Tide (Mock Tax)",
+    "Escape Hatch Gate",
+    "SRP Guardrails",
+    "Test Discipline"
+  ]
+}
