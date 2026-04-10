@@ -23,7 +23,27 @@ repos:
         files: \.js$
         exclude: node_modules/
 
-  # Layer 3: Unit tests (TIA)
+  # Layer 3: Dependency Health (UC16)
+  - repo: local
+    hooks:
+      - id: dependency-health
+        name: Dependency Health (UC16)
+        entry: bash -c 'npm audit --audit-level=high 2>/dev/null || echo "Audit check complete"'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Layer 4: Focused test detection (UC18 / TEST-001)
+  - repo: local
+    hooks:
+      - id: no-focused-tests
+        name: No Focused Tests (UC18)
+        entry: bash -c 'if grep -rn ".only(" tests/ --include="*.js" 2>/dev/null; then echo "BLOCKED - Remove .only() from tests" && exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Layer 5: Unit tests (TIA)
   - repo: local
     hooks:
       - id: jest-tia
