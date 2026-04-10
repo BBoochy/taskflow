@@ -1,0 +1,32 @@
+/**
+ * Pure task data model — zero DOM, zero localStorage, zero side effects.
+ */
+
+let counter = 0;
+
+function createTask(title) {
+  return {
+    id: `${Date.now()}-${++counter}`,
+    title,
+    completed: false,
+    createdAt: new Date(),
+  };
+}
+
+function toggleTask(task) {
+  return { ...task, completed: !task.completed };
+}
+
+function deleteTask(tasks, taskId) {
+  return tasks.filter(t => t.id !== taskId);
+}
+
+function filterTasks(tasks, filter) {
+  switch (filter) {
+    case 'active': return tasks.filter(t => !t.completed);
+    case 'completed': return tasks.filter(t => t.completed);
+    default: return [...tasks];
+  }
+}
+
+module.exports = { createTask, toggleTask, deleteTask, filterTasks };
