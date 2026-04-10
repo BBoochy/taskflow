@@ -2,6 +2,12 @@
   "name": "taskflow",
   "version": "0.1.0",
   "scripts": {
-    "test": "node tests/run.js"
+    "test": "jest --forceExit",
+    "test:coverage": "jest --coverage --forceExit",
+    "test:tia": "node scripts/test-impact-analysis.js",
+    "test:changed": "jest --changedSince=master --forceExit"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0"
   }
 }
