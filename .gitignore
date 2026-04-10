@@ -5,8 +5,7 @@ out/
 coverage/
 .nyc_output/
 .env
-.env.local
-.env.*.local
+.env.*
 *.env
 !.env.example
 .vscode/
