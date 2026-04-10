@@ -1,0 +1,162 @@
+version: 1
+
+environment:
+  apiPort: 3000
+  shell: 'bash'
+
+conventions:
+  directories:
+    - pattern: "**/*.test.js"
+      location: "tests/"
+    - pattern: "**/*.spec.js"
+      location: "tests/"
+  naming:
+    - filePattern: '*.js'
+      className: 'PascalCase'
+      functionName: 'camelCase'
+      constantName: 'SCREAMING_SNAKE_CASE'
+
+deprecatedPatterns:
+  - id: dep-request
+    import: request
+    message: 'Use fetch instead of request.'
+    languages: [javascript]
+
+  - id: dep-moment
+    import: moment
+    message: 'Use date-fns or dayjs instead of moment.'
+    languages: [javascript]
+
+Detectors:
+  # UC01: Directory Reinforcement
+  directoryReinforcement:
+    enabled: true
+    rules:
+      - pattern: '**/*.test.js'
+        expectedDir: 'tests'
+        reason: 'Test files should be in tests/'
+      - pattern: '**/*.config.js'
+        expectedDir: '.'
+        reason: 'Config files should be in project root'
+
+  # UC03/UC10: Naming Convention
+  namingConvention:
+    enabled: true
+    fileNaming: 'kebab-case'
+    variableNaming: 'camelCase'
+    functionNaming: 'camelCase'
+    classNaming: 'PascalCase'
+    constantNaming: 'SCREAMING_SNAKE_CASE'
+    excludePatterns:
+      - '**/*.test.js'
+      - '**/*.config.*'
+      - '**/DEMO-*'
+      - '**/README*'
+
+  # UC04: Environment Reinforcement
+  environmentReinforcement:
+    enabled: true
+    checkPaths: true
+    checkCommands: true
+
+  # UC06: Temporary Files
+  tempFiles:
+    enabled: true
+    patterns:
+      - '**/*.tmp'
+      - '**/temp_*'
+      - '**/scratch_*'
+      - '**/*.bak'
+      - '**/debug_*'
+
+  # UC07: Flat Architecture
+  flatArchitecture:
+    enabled: true
+    targets:
+      - path: 'src'
+        maxRootFiles: 10
+        minSubdirs: 0
+        excludePatterns: ['node_modules/**']
+
+  # UC08: Configuration Chaos
+  configChaos:
+    enabled: true
+    requiredConfigs:
+      - '.gitignore'
+      - 'package.json'
+
+  # UC09: File Proliferation
+  fileProliferation:
+    enabled: true
+    threshold: 3
+
+  # UC11: Overcrowded Folders
+  overcrowdedFolders:
+    enabled: true
+    targets:
+      - path: 'src'
+        maxFiles: 20
+      - path: 'tests/unit'
+        maxFiles: 20
+      - path: 'tests/integration'
+        maxFiles: 20
+
+  # UC16: Dependency Health (Pro)
+  dependencyHealth:
+    enabled: true
+    severityThreshold: 'high'
+
+  # UC17: Production Readiness (Pro)
+  productionReadiness:
+    enabled: true
+
+  # Project Scaffolding
+  projectScaffolding:
+    enabled: true
+    rootMaxFiles: 15
+
+  # Dead End Directories
+  deadEnds:
+    enabled: true
+    ignoreGlobs: []
+    maxFiles: 500
+    timeBudgetMs: 5000
+
+# UC18: Structural Governance Rules (Pro)
+governance:
+  rules:
+    - id: "TEST-001"
+      name: "No Focused Tests"
+      severity: "error"
+      files: "**/*.test.js"
+      assertions:
+        - type: "forbidden_pattern"
+          pattern: "(describe|it|test)\\.only"
+          message: "Remove .only() before committing"
+
+    - id: "TEST-002"
+      name: "No Skipped Tests"
+      severity: "warning"
+      files: "**/*.test.js"
+      assertions:
+        - type: "forbidden_pattern"
+          pattern: "(describe|it|test)\\.skip"
+          message: "Remove .skip() — skipped tests are dead code"
+
+    - id: "SEC-001"
+      name: "No console.log in source"
+      severity: "warning"
+      files: "src/**/*.js"
+      assertions:
+        - type: "forbidden_pattern"
+          pattern: "console\\.log\\("
+          message: "Use a logger instead of console.log in production code"
+
+    - id: "ARCH-001"
+      name: "No require in test mocks from src"
+      severity: "error"
+      files: "tests/mocks/**/*.js"
+      assertions:
+        - type: "forbidden_pattern"
+          pattern: "require\\(['\"]\\.\\./"
+          message: "Mocks should not import from source — they provide test doubles"
