@@ -1,0 +1,38 @@
+node_modules/
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+.eslintcache
+.cache/
+*.tsbuildinfo
+
+# Secrets
+credentials.json
+secrets.yaml
+*.pem
+*.key
+*.crt
+
+# Mault Memory Layer (auto)
+.memory-layer/
+.memory-layer/cache/
+.memory-layer/logs/
+.memory-layer/reports/
+.memory-layer/archive/
+
+# Scaffolded by Mault — do not commit
+.claude/hooks/
