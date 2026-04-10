@@ -20,4 +20,4 @@ const config = {
 //     throw new Error(`Missing required env vars: ${missing.join(', ')}`);
 //   }
 
-export default config;
+module.exports = config;
