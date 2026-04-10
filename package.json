@@ -5,7 +5,8 @@
     "test": "jest --forceExit",
     "test:coverage": "jest --coverage --forceExit",
     "test:tia": "node scripts/test-impact-analysis.js",
-    "test:changed": "jest --changedSince=master --forceExit"
+    "test:changed": "jest --changedSince=master --forceExit",
+    "prepare": "pre-commit install || echo 'pre-commit not found, skipping hook install'"
   },
   "devDependencies": {
     "jest": "^30.3.0"
