@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate HTML structure
+        run: |
+          grep -q 'id="app"' src/index.html
+          grep -q 'app.js' src/index.html
+          echo "HTML structure valid"
+      - name: Check for console errors in JS
+        run: |
+          node --check src/app.js
+          node --check src/config.js
+          echo "JS syntax valid"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run tests
+        run: npm test
